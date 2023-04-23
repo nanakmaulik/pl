@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders Panel</title>
+
+    <style>
+        img {
+            width: 100px;
+        }
+
+        table {
+            text-align: left;
+            margin-left: 220px;
+            background-color: wheat;
+            table-layout: auto;
+            border: 20px;
+
+        }
+
+        table td,
+        table th {
+            padding: 10px 50px;
+            text-align: left;
+            border: 2px solid black;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Lato", sans-serif;
+        }
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 200px;
+            background-color: wheat;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .sidebar a {
+            display: block;
+            color: black;
+            padding: 16px;
+            text-decoration: none;
+        }
+
+        .sidebar a.active {
+            background-color: black;
+            color: white;
+        }
+
+        .sidebar a:hover:not(.active) {
+            background-color: #555;
+            color: white;
+        }
+
+        div.content {
+            margin-left: 210px;
+            padding: 1px 16px;
+            height: 80px;
+        }
+
+        .confirmButton {
+            padding: 8px 20px;
+            background-color: rgb(255, 255, 255);
+            border: 1px solid rgb(0, 0, 0);
+            cursor: pointer;
+        }
+
+        @media screen and (max-width: 700px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .sidebar a {
+                float: left;
+            }
+
+            div.content {
+                margin-left: 0;
+            }
+        }
+
+        @media screen and (max-width: 400px) {
+            .sidebar a {
+                text-align: center;
+                float: none;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <a class="active" href="#Dashboard">Dashboard</a>
+        <a href="../index.html">Website</a>
+        <a href="#">Products</a>
+        <!-- <a href="#about">About</a> -->
+    </div>
+
+    <div class="content">
+        <h2>Orders Table</h2>
+    </div>
+
+
+    <table id="table">
+        <tr>
+            <th>Sr No.</th>
+            <th>Order ID</th>
+            <th>Product ID</th>
+            <th>Product Image</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Order Timing</th>
+            <th>Confirmation</th>
+        </tr>
+    </table>
+    </head>
+
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCGS17u8p2yaAR8lIV4JySOfnClJ-qYepM",
+            authDomain: "paridhan-3378c.firebaseapp.com",
+            databaseURL: "https://paridhan-3378c-default-rtdb.firebaseio.com",
+            projectId: "paridhan-3378c",
+            storageBucket: "paridhan-3378c.appspot.com",
+            messagingSenderId: "308781119121",
+            appId: "1:308781119121:web:82aa64145348521c64f130"
+        };
+        //initializing firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js">
+    </script>
+    <script type="text/javascript">
+        (function () {
+            emailjs.init("J24zDK8Av9DrDaNsp");
+        })();
+    </script>
+
+    <script>
+        var productArr = [{
+                empty: "empty"
+            },
+            {
+                name: "Lehenga",
+                price: 800,
+                desc: "A beautiful wedding dress"
+            },
+            {
+                name: "Saree",
+                price: 900,
+                desc: "A beautiful wedding dress"
+            }
+        ];
+
+        function fetchOrders() {
+            var db = firebase.database();
+            var sno = 0;
+            db.ref("order").once("value", (value) => {
+                value.forEach(order => {
+                    var orderItem = order.val();
+
+                    var tr = document.createElement("tr");
+                    var td = document.createElement("td");
+                    td.innerHTML = ++sno;
+
+                    var td0 = document.createElement("td");
+                    td0.innerHTML = orderItem.orderId;
+
+                    var td1 = document.createElement("td");
+                    td1.innerHTML = orderItem.ProductId;
+
+                    var td2 = document.createElement("td");
+                    var img = document.createElement("img");
+                    img.src = "../img/p" + orderItem.ProductId + ".png";
+
+                    var td3 = document.createElement("td");
+                    td3.innerHTML = orderItem.name;
+
+                    var td4 = document.createElement("td");
+                    td4.innerHTML = orderItem.email;
+
+                    var td5 = document.createElement("td");
+                    td5.innerHTML = orderItem.date;
+
+                    var td6 = document.createElement("td");
+                    var confirmButton = document.createElement("button");
+                    confirmButton.className = "confirmButton";
+                    confirmButton.setAttribute('onclick', "sendMail('" + JSON.stringify(orderItem) +
+                        "')")
+
+                    // var mailBody = "Thank you " + orderItem.name + " for your order. \n" +
+                    //     "Here are your order details: \n" +
+                    //     "Product Image: " + "<img src='p" + orderItem.ProductId + ".png'> \n" +
+                    //     "1. Product Name: " + productArr[orderItem.ProductId].name + " \n" +
+                    //     "2. Product Price: " + productArr[orderItem.ProductId].price + " \n" +
+                    //     "3. Product Description: " + productArr[orderItem.ProductId].desc + " \n" +
+                    //     "4. Your address: " + orderItem.address + " \n" +
+                    //     "5. Order Date and Time: " + orderItem.date + " \n" +
+                    //     "If you have any queries regarding your order, please contact us at example@gmail.com";
+
+                    // confirmButton.href = "mailto:" + orderItem.email +
+                    //     "?subject=Order Confirmation for Order ID: " + orderItem.orderId +
+                    //     " &body=" + encodeURIComponent(mailBody);
+
+                    confirmButton.innerHTML = "Confirm";
+                    td6.append(confirmButton);
+
+                    td2.append(img);
+                    tr.append(td, td0, td1, td2, td3, td4, td5, td6);
+                    document.getElementById("table").append(tr);
+                });
+            });
+        }
+
+        function sendMail(orderItem) {
+            let orderItem2 = JSON.parse(orderItem);
+            let customerDetails = {
+                orderId: orderItem2.orderId,
+                customerName: orderItem2.name,
+                customerEmail: orderItem2.email,
+                productName: productArr[orderItem2.ProductId].name,
+                productDescription: productArr[orderItem2.ProductId].desc,
+                customerAddress: orderItem2.address,
+                productPrice: productArr[orderItem2.ProductId].price,
+                timings: orderItem2.date,
+                productImage: orderItem2.ProductId,
+            }
+
+            emailjs.send("service_kv9rdth", "template_s3w0kzs", customerDetails)
+                .then(function (response) {
+                    alert('SUCCESS!', response.status, response.text);
+                }, function (error) {
+                    alert('FAILED... Send Again');
+                    console.log(error);
+                });
+        }
+
+        function login() {
+            var db = firebase.database();
+
+            db.ref("login").once("value", (value) => {
+                var login = value.val();
+
+                var username = prompt("Enter your username");
+
+                if (username != login.id) {
+                    alert("Username didn't match");
+                    return;
+                }
+
+                var password = prompt("Enter your password");
+                if (password != login.pass) {
+                    alert("Password didn't match");
+                    return;
+                }
+
+            })
+        }
+
+        fetchOrders();
+        login();
+    </script>
+</body>
+
+</html>
