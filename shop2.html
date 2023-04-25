@@ -550,6 +550,150 @@
     </div>
     <!-- Shop End -->
 
+<style>
+        #overlay {
+            position: fixed;
+            display: none;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2;
+            cursor: pointer;
+        }
+        /* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+  .col-25, .col-75, input[type=submit] {
+    width: 100%;
+    margin-top: 0;
+  }
+}
+    </style>
+    </head>
+
+    <body>
+
+        <div id="overlay">
+            <div class="formp">
+                <label for="fname" class="fn">First name:</label><br>
+                <div class="control-group">
+                    <input type="text" class="form-control" id="name" placeholder="Your Name" required
+                        data-validation-required-message="Please enter your name" />
+                    <p class="help-block text-danger"></p>
+                </div>
+                <!-- <label for="lname">Last name:</label><br>
+                <div class="control-group">
+                    <input type="text" class="form-control" id="lname" placeholder="Your Last Name" required="required"
+                        data-validation-required-message="Please enter your name" />
+                    <p class="help-block text-danger"></p>
+                </div>
+                <label for="fname">Contact Number:</label><br>
+                <div class="control-group">
+                    <input type="text" class="form-control" id="no" placeholder="Your Contact Number"
+                        required="required" data-validation-required-message="Please enter your name" />
+                    <p class="help-block text-danger"></p>
+                </div> -->
+                <label for="email" class="fn">Email ID:</label><br>
+                <div class="control-group">
+                    <input type="email" class="form-control" id="email" placeholder="Your Email"
+                        required="required" data-validation-required-message="Please enter your Email" />
+                    <p class="help-block text-danger"></p>
+                </div>
+                <label for="address" class="fn">Address:</label><br>
+                <div class="control-group">
+                    <input type="email" class="form-control" id="address" placeholder="Your address"
+                        required="required" data-validation-required-message="Please enter your Email" />
+                    <p class="help-block text-danger"></p>
+                </div>
+                <!-- <label for="fname">Address:</label><br>
+                <div class="control-group">
+                    <input type="text" class="form-control" id="address" placeholder="address"
+                        data-validation-required-message=" enter your name" />
+                    <p class="help-block text-danger"></p>
+                </div> -->
+                <button id="btnp1" type="submit" class="btngp" onclick="order()">Submit</button>
+                <span style="display: none;" :none id="product"></span>
+                <button class="closebtn" onclick="cross()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+	     https://firebase.google.com/docs/web/setup#available-libraries -->
+        <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-analytics.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase.js"></script>
+
+        <script>
+            const firebaseConfig = {
+                apiKey: "AIzaSyCGS17u8p2yaAR8lIV4JySOfnClJ-qYepM",
+                authDomain: "paridhan-3378c.firebaseapp.com",
+                databaseURL: "https://paridhan-3378c-default-rtdb.firebaseio.com",
+                projectId: "paridhan-3378c",
+                storageBucket: "paridhan-3378c.appspot.com",
+                messagingSenderId: "308781119121",
+                appId: "1:308781119121:web:82aa64145348521c64f130"
+            };
+            //initializing firebase
+            firebase.initializeApp(firebaseConfig);
+        </script>
+
+        <script>
+            function cross() {
+                document.getElementById("overlay").style.display = "none";
+            }
+
+            function openForm(ProductId) {
+                document.getElementById("overlay").style.display = "block";
+                document.getElementById("product").innerHTML = ProductId;
+            }
+
+            let paymentArr = [0, "https://rzp.io/l/SwiswJt6qi", "https://rzp.io/l/SrWeKNt1iD" , "https://rzp.io/l/3g6uZC9VmB" , "https://rzp.io/l/90IZOnq1XR" , "https://rzp.io/l/4aJiZP1Ey", "https://rzp.io/l/oU4hGf6JSK", "https://rzp.io/l/1CBoSqnl6", "https://rzp.io/l/Jf3IXqL9Qj", "https://rzp.io/l/MsJhCtZ", "https://rzp.io/l/J1tHuNh", "https://rzp.io/l/0JWxSCK" , "https://rzp.io/l/TR2kBoW3", "https://rzp.io/l/2LHjBApo", "https://rzp.io/l/BUfjEf5sTc", "https://rzp.io/l/3IhnwW3Uj","https://rzp.io/l/qyOOXLDh", "https://rzp.io/l/GRbZlNkqR", "https://rzp.io/l/pE1T3r7e", "https://rzp.io/l/GUvigeXBhr", "https://rzp.io/l/mEku7a1"]
+
+            var orderDB = firebase.database().ref('order');
+
+            function order() {
+                let date = new Date().toLocaleString();
+                let orderId = 100000 + Math.floor(Math.random() * 900000);
+                let name = document.getElementById('name').value;
+                // let lname = document.getElementById('lname').value;
+                // let no = document.getElementById('no').value;
+                let email = document.getElementById('email').value;
+                let address = document.getElementById('address').value;
+                // let address = document.getElementById('address').value;
+                let ProductId = document.getElementById('product').innerHTML;
+                if (name == "") {
+                    document.getElementById('name').focus();
+                    return;
+                }
+                if (email == "") {
+                    document.getElementById('email').focus();
+                    return;
+                }
+                orderDB.push({
+                    name: name,
+                    // lname: lname,
+                    // no: no,
+                    email: email,
+                    // address: address,
+                    ProductId: ProductId,
+                    date: date,
+                    orderId: orderId,
+                    address: address
+                }).then(() => {
+                    window.location.href = paymentArr[ProductId];
+                }).then(() => {
+                    alert('Successfully sent message'); // toast
+                    name = "";
+                    email = "";
+                    product = "";
+                })
+            }
+        </script>
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-secondary mt-5 pt-5">
